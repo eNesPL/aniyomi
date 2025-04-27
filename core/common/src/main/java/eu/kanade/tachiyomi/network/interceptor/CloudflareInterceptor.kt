@@ -24,6 +24,10 @@ class CloudflareInterceptor(
 
     private val flaresolverrEndpoint = "https://flaresolverr.e-nes.eu/v1"
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
+    private val jsonParser = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
 
     override fun shouldIntercept(response: Response): Boolean {
         // Check if Cloudflare anti-bot is on
@@ -61,7 +65,10 @@ class CloudflareInterceptor(
             
             // Update cookies from the solution
             solution.cookies.forEach { cookie ->
-                cookieManager.addFromHeader(request.url, cookie)
+                cookieManager.saveFromResponse(
+                    request.url, 
+                    listOf(Cookie.parse(request.url, cookie)!!)
+                )
             }
 
             return chain.proceed(request.newBuilder().url(solution.url).build())
