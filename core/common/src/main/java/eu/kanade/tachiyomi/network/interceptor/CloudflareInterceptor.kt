@@ -84,7 +84,7 @@ class CloudflareInterceptor(
     }
 
     private fun parseFlaresolverrResponse(responseBody: String?): Solution {
-        val json = responseBody?.let { jsonParser.parseJson(it).jsonObject } ?: throw IOException("Empty response from Flaresolverr")
+        val json = responseBody?.let { jsonParser.parseToJsonElement(it).jsonObject } ?: throw IOException("Empty response from Flaresolverr")
         
         if (json["status"]?.jsonPrimitive?.content != "ok") {
             throw IOException("Flaresolverr error: ${json["message"]?.jsonPrimitive?.content}")
