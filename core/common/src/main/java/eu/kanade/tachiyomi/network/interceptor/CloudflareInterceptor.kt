@@ -4,9 +4,15 @@ import android.content.Context
 import android.widget.Toast
 import eu.kanade.tachiyomi.network.AndroidCookieJar
 import eu.kanade.tachiyomi.util.system.toast
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import okhttp3.Cookie
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -20,7 +26,7 @@ class CloudflareInterceptor(
     private val context: Context,
     private val cookieManager: AndroidCookieJar,
     defaultUserAgentProvider: () -> String,
-) : WebViewInterceptor(context, defaultUserAgentProvider) {
+) : Interceptor {
 
     private val flaresolverrEndpoint = "https://flaresolverr.e-nes.eu/v1"
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
@@ -28,6 +34,7 @@ class CloudflareInterceptor(
         ignoreUnknownKeys = true
         isLenient = true
     }
+    private val defaultUserAgentProvider: () -> String
 
     override fun shouldIntercept(response: Response): Boolean {
         // Check if Cloudflare anti-bot is on
