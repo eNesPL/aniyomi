@@ -278,6 +278,7 @@ object SettingsAdvancedScreen : SearchableSettings {
                         true
                     },
                 ),
+
                 Preference.PreferenceItem.EditTextPreference(
                     pref = userAgentPref,
                     title = stringResource(MR.strings.pref_user_agent_string),
@@ -300,6 +301,15 @@ object SettingsAdvancedScreen : SearchableSettings {
                         userAgentPref.delete()
                         context.toast(MR.strings.requires_app_restart)
                     },
+                ),
+                Preference.PreferenceItem.EditTextPreference(
+                    pref = networkPreferences.flaresolverrEndpoint(),
+                    title = "Flaresolverr endpoint URL", //todo: make it correctly use string
+                    subtitle = "The base URL for your Flaresolverr server (e.g. https://flaresolverr.example.com/v1)", //todo: make it correctly use string
+                    onValueChanged = {
+                        context.toast(MR.strings.requires_app_restart)
+                        true
+                    }
                 ),
             ),
         )

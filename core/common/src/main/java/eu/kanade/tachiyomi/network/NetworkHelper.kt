@@ -1,3 +1,4 @@
+// File: core/common/src/main/java/eu/kanade/tachiyomi/network/NetworkHelper.kt
 package eu.kanade.tachiyomi.network
 
 import android.content.Context
@@ -11,6 +12,7 @@ import okhttp3.brotli.BrotliInterceptor
 import okhttp3.logging.HttpLoggingInterceptor
 import java.io.File
 import java.util.concurrent.TimeUnit
+import eu.kanade.tachiyomi.network.NetworkPreferences
 
 class NetworkHelper(
     private val context: Context,
@@ -28,8 +30,8 @@ class NetworkHelper(
             .cache(
                 Cache(
                     directory = File(context.cacheDir, "network_cache"),
-                    maxSize = 5L * 1024 * 1024, // 5 MiB
-                ),
+                    maxSize = 5L * 1024 * 1024 // 5 MiB
+                )
             )
             .addInterceptor(UncaughtExceptionInterceptor())
             .addInterceptor(UserAgentInterceptor(::defaultUserAgentProvider))
@@ -44,23 +46,28 @@ class NetworkHelper(
         }
 
         builder.addInterceptor(
-            CloudflareInterceptor(context, cookieJar, ::defaultUserAgentProvider),
+            CloudflareInterceptor(
+                context = context,
+                cookieManager = cookieJar,
+                defaultUserAgentProvider = ::defaultUserAgentProvider,
+                networkPreferences = preferences        // <-- use the constructor parameter here
+            )
         )
 
         when (preferences.dohProvider().get()) {
             PREF_DOH_CLOUDFLARE -> builder.dohCloudflare()
-            PREF_DOH_GOOGLE -> builder.dohGoogle()
-            PREF_DOH_ADGUARD -> builder.dohAdGuard()
-            PREF_DOH_QUAD9 -> builder.dohQuad9()
-            PREF_DOH_ALIDNS -> builder.dohAliDNS()
-            PREF_DOH_DNSPOD -> builder.dohDNSPod()
-            PREF_DOH_360 -> builder.doh360()
-            PREF_DOH_QUAD101 -> builder.dohQuad101()
-            PREF_DOH_MULLVAD -> builder.dohMullvad()
-            PREF_DOH_CONTROLD -> builder.dohControlD()
-            PREF_DOH_NJALLA -> builder.dohNajalla()
-            PREF_DOH_SHECAN -> builder.dohShecan()
-            PREF_DOH_LIBREDNS -> builder.dohLibreDNS()
+            PREF_DOH_GOOGLE    -> builder.dohGoogle()
+            PREF_DOH_ADGUARD   -> builder.dohAdGuard()
+            PREF_DOH_QUAD9     -> builder.dohQuad9()
+            PREF_DOH_ALIDNS    -> builder.dohAliDNS()
+            PREF_DOH_DNSPOD    -> builder.dohDNSPod()
+            PREF_DOH_360       -> builder.doh360()
+            PREF_DOH_QUAD101   -> builder.dohQuad101()
+            PREF_DOH_MULLVAD   -> builder.dohMullvad()
+            PREF_DOH_CONTROLD  -> builder.dohControlD()
+            PREF_DOH_NJALLA    -> builder.dohNajalla()
+            PREF_DOH_SHECAN    -> builder.dohShecan()
+            PREF_DOH_LIBREDNS  -> builder.dohLibreDNS()
         }
 
         builder.build()
